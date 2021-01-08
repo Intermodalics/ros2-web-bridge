@@ -18,6 +18,7 @@
 
 const rosbridge = require('../index.js');
 const app = require('commander');
+const path = require('path');
 const pkg = require('../package.json');
 
 app
@@ -33,6 +34,13 @@ app
   .option('-g, --params_glob [glob_list]', 'A list or None')
   .option('-b, --bson_only_mode', 'Unsupported in WebSocket server, will be ignored')
   .option('-l, --status_level [level_string]', 'Status level (one of "error", "warning", "info", "none"; default "error")')
+  .option('--topic-config <path>', 'Path to a topic config (js file)') // example.topic-config.js
   .parse(process.argv);
+
+  if (app.topicConfig) {
+    const SubscriptionManager = require('../lib/subscription_manager.js');
+    const {config} = require(path.resolve(app.topicConfig));
+    SubscriptionManager._opts = config;
+  }
 
 rosbridge.createServer(app);
